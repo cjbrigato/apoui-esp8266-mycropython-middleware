@@ -46,7 +46,7 @@ import sys  # MiroPython doesn't yet have a string module
 
 __all__ = ["Cmd"]
 
-PROMPT = '(Cmd) '
+PROMPT = '~$ '
 #IDENTCHARS = string.ascii_letters + string.digits + '_'
 IDENTCHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 

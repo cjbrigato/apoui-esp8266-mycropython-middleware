@@ -32,12 +32,15 @@ class ApouiShell(Cmd):
             print("<< Ambigous : {0}".format(args))
 
     def do_quit(self, args):
-        print("Quitting.")
+        print("> System will reset")
         machine.reset()
+
+    def emptyline(self):
+        pass
 
 
 class ApouiControl:
-    """ 
+    """
     This is firt Domotic Controller
     This has to be used to a shell class of sort
     """
@@ -87,7 +90,7 @@ class MicroWifi:
     def _do_connect(self, ssid, key):
         sta_if = network.WLAN(network.STA_IF)
         if not sta_if.isconnected():
-            print('>WIFI:', end="")
+            print('>> Wifi Network : ', end="")
             sta_if.active(True)
             sta_if.connect(ssid, key)
             while not sta_if.isconnected():
@@ -95,22 +98,39 @@ class MicroWifi:
         print('OK')
 
 
-def boot(productstate):
-    print("->KERNEL")
-    print(productstate)
+def system_release(build):
+    print(" .:::.   .:::.")
+    print(":::::::.:::::::")
+    print(":::::::::::::::   Cystick_Handlers(tm)")
+    print("':::::::::::::'    < APOUI-SYSTEMS >")
+    print("  ':::::::::'              - ")
+    print("    ':::::'  [Home middleware Controller]   ")
+    print("      ':'        build {0}".format(build))
+    print()
+
+
+def boot(build):
+    system_release(build)
+    print(">> Booting KERNEL")
+    # Set it at 160Mhz for full speed
+    machine.freq(160000000)
     # We should have a list of wifi we can try to connect to ?
     #[i for i, v in enumerate(network.WLAN(network.STA_IF).scan()) if v[0] == 'excellency']
     wifi = MicroWifi('APOUI', 'astis4-maledictio6-pultarius-summittite')
     controller = ApouiControl('http://control.maison.apoui.net/setrelay')
-    print('>TESTS:1')
-    print("->READY")
+    print('>> Controller Tests...')
+    print("!> READY")
+    print()
     return controller
 
 
 def main():
-    controller = boot('>V:A0B')
+    controller = boot('b1483918977')
     shell = ApouiShell(controller)
-    shell.prompt = 'apoui@hc> '
-    shell.cmdloop('Ready. Spawning ApouiShell')
+    shell.cmdloop()
+    #try:
+    #    shell.cmdloop()
+    #except KeyboardInterrupt:
+    #    print("<< Received SIGINT from Keyboard")
 
 main()

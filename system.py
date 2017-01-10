@@ -15,6 +15,9 @@ import socket
 
 class Kernel:
 
+    default_ssid = 'APOUI'
+    default_key = 'astis4-maledictio6-pultarius-summittite'
+
     def __init__(self):
         self.handle()
 
@@ -36,7 +39,7 @@ class Kernel:
         machine.freq(160000000)
         # We should have a list of wifi we can try to connect to ?
         #[i for i, v in enumerate(network.WLAN(network.STA_IF).scan()) if v[0] == 'excellency']
-        wifi = MicroWifi('APOUI', 'astis4-maledictio6-pultarius-summittite')
+        wifi = MicroWifi(self.default_ssid, self.default_key)
         controller = ApouiControl('http://control.maison.apoui.net/setrelay')
         print('>> Controller Tests...')
         print("!> READY")
@@ -175,6 +178,9 @@ class MicroWifi:
                 time.sleep_ms(500)
                 if tries == 10:
                     print("Cannot Connect to Wifi :(")
-                    print("Aborted")
-                    sys.exit(127)
+                    new_ssid = input(" New SSID ? ")
+                    new_key = input(" New Key ? ")
+                    self._do_connect(new_ssid, new_key)
+                    # print("Aborted")
+                    # sys.exit(127)
         print('OK')

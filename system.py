@@ -2,6 +2,7 @@
 SystemOS Module
 """
 import sys
+import time
 import machine
 import network
 import socket
@@ -27,8 +28,8 @@ class Kernel:
         print("      ':'        build {0}".format(build))
         print()
 
-
     def boot(self, build):
+        VT100.clear()
         self.system_release(build)
         print(">> Booting KERNEL")
         # Set it at 160Mhz for full speed
@@ -42,7 +43,6 @@ class Kernel:
         print()
         return controller
 
-
     def handle(self):
         controller = self.boot('b1483918977')
         shell = KernelShell(controller)
@@ -51,6 +51,14 @@ class Kernel:
         #    shell.cmdloop()
         # except KeyboardInterrupt:
         #    print("<< Received SIGINT from Keyboard")
+
+
+class VT100:
+
+    @staticmethod
+    def clear():
+        print("\x1B\x5B2J", end="")
+        print("\x1B\x5BH", end="")
 
 
 class KernelDriver:
@@ -150,12 +158,23 @@ class MicroWifi:
         self.key = key
         self._do_connect(self.ssid, self.key)
 
+    # Should make Wifi Network choosable when cannot connect (interactive)
+    # Should propose it first time
+    # Sould save wifi informations in a file
+
     def _do_connect(self, ssid, key):
+        tries = 0
         sta_if = network.WLAN(network.STA_IF)
         if not sta_if.isconnected():
             print('>> Wifi Network : ', end="")
             sta_if.active(True)
             sta_if.connect(ssid, key)
             while not sta_if.isconnected():
-                pass
+                print('.', end="")
+                tries += 1
+                time.sleep_ms(500)
+                if tries == 10:
+                    print("Cannot Connect to Wifi :(")
+                    print("Aborted")
+                    sys.exit(127)
         print('OK')

@@ -1,2 +1,2 @@
-from system import Kernel
-kernel = Kernel()
+import system
+system.Kernel()

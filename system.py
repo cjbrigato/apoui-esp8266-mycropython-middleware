@@ -1,6 +1,7 @@
 """
 SystemOS Module
 """
+import os
 import sys
 import time
 import machine
@@ -138,7 +139,7 @@ class ApouiControl:
         s.connect(addr)
         s.send(bytes('GET /%s HTTP/1.1\r\nHost: %s\r\n\r\n' %
                      (path, host), 'utf8'))
-        """ Tempory buh
+        """ Tempory bug
         while True:
             data = s.recv(8192)
             if data:
@@ -165,8 +166,26 @@ class MicroWifi:
     # Should propose it first time
     # Sould save wifi informations in a file
 
+    def _register_connect(self):
+        print('!> Registering new connection :')
+        try:
+            os.remove('wlan.conf')
+        except:
+            print('i> no wlan.conf')
+        new_ssid = input("   New SSID ? ")
+        new_key = input("   New Key ? ")
+        f = open('wlan.conf', 'wb')
+        f.write(new_ssid, '_:_', new_key)
+
     def _do_connect(self, ssid, key):
         tries = 0
+        try:
+            f = open('wlan.conf', r)
+        except:
+            print('E> No wlan chosen')
+            input('   Press ENTER to register connection')
+            self._register_connect()
+            return
         sta_if = network.WLAN(network.STA_IF)
         if not sta_if.isconnected():
             print('>> Wifi Network : ', end="")
@@ -176,11 +195,16 @@ class MicroWifi:
                 print('.', end="")
                 tries += 1
                 time.sleep_ms(500)
-                if tries == 10:
+                if tries == 20:
                     print("Cannot Connect to Wifi :(")
-                    new_ssid = input(" New SSID ? ")
-                    new_key = input(" New Key ? ")
-                    self._do_connect(new_ssid, new_key)
+                    q = input(" NR:NewReg / RT:Retry : ")
+                    if q == "NR":
+                        self._register_connect()
+                        return
+                    else:
+                        self._do_connect(ssid, key)
+                        return
                     # print("Aborted")
                     # sys.exit(127)
         print('OK')
+        print('*> IP Address:', sta_if.ifconfig()[0])
